@@ -16,14 +16,10 @@
  */
 package ejemplocontrolacceso;
 
-import es.javiergarbedo.aula.util.JgConversionUtil;
-import es.javiergarbedo.aula.util.JgSystemUtil;
-import es.javiergarbedo.aula.util.JgValidatorUtil;
 import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.Properties;
-import java.util.ResourceBundle;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
 
@@ -84,6 +80,42 @@ public class SettingsDialog extends javax.swing.JDialog {
         //Marcar como seleccionado el idioma del archivo de propiedades
         jComboBoxLanguage.setSelectedIndex(indexOfLanguage);
     }
+    
+    public static boolean isPasswordValid(char[] password, int minLength, 
+            boolean digitRequired, boolean lowerCaseRequired, 
+            boolean upperCaseRequired, boolean specialCharRequired) {
+        
+        boolean hasDigit = false;
+        boolean hasLower = false;
+        boolean hasUpper = false;
+        boolean hasSpecialChar = false;
+        
+        if(password.length >= minLength) {
+            for(int i=0; i<password.length; i++) {
+                char c = password[i];
+                if(Character.isDigit(c)) {
+                    hasDigit = true;
+                }
+                if(Character.isLetter(c) && Character.isLowerCase(c)) {
+                    hasLower = true;
+                }
+                if(Character.isLetter(c) && !Character.isLowerCase(c)) {
+                    hasUpper = true;
+                }
+                if(!Character.isDigit(c) && !Character.isAlphabetic(c)) {
+                    hasSpecialChar = true;
+                }
+            }
+            //Comprobar si se cumplen todas las condiciones impuestas
+            if(digitRequired == hasDigit && lowerCaseRequired == hasLower &&
+                    upperCaseRequired == hasUpper && 
+                    specialCharRequired == hasSpecialChar) {
+                return true;
+            } 
+        }
+        return false;
+    }
+    
     
     /**
      * This method is called from within the constructor to initialize the form.
@@ -235,7 +267,7 @@ public class SettingsDialog extends javax.swing.JDialog {
             confirmPassword = jPasswordFieldConfirm.getPassword();
 
             //Codificar la contraseña anterior para compararla después
-            String oldPasswordMd5 = JgConversionUtil.toMd5(oldPassword, false);
+            String oldPasswordMd5 = Util.toMd5(oldPassword, false);
 
             //Obtener la contraseña codificada que hay en el archivo de propiedades
             String passwordPropertyMd5 = null;
@@ -252,12 +284,12 @@ public class SettingsDialog extends javax.swing.JDialog {
                 if (Arrays.equals(newPassword, confirmPassword)) {
 
                     //Comprobar si la contraseña cumple con los requisitos mínimos
-                    if (JgValidatorUtil.isPasswordValid(newPassword,
+                    if (isPasswordValid(newPassword,
                             Globals.PASSWORD_MIN_LENGTH, Globals.PASSWORD_REQUIRE_DIGIT,
                             Globals.PASSWORD_REQUIRE_LOWERCASE, Globals.PASSWORD_REQUIRE_UPPERCASE,
                             Globals.PASSWORD_REQUIRE_SPECIALCHAR)) {
                         //Codificar la nueva contraseña
-                        String newPasswordMd5 = JgConversionUtil.toMd5(newPassword, true);
+                        String newPasswordMd5 = Util.toMd5(newPassword, true);
                         //Guardar la contraseña codificada en el archivo de propiedades
                         properties.setProperty(Globals.PROPERTY_KEY_PASSWORD, newPasswordMd5);
 
@@ -303,7 +335,7 @@ public class SettingsDialog extends javax.swing.JDialog {
                     Globals.BUNDLE.getString("appTitle"), 
                     JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
             if (response == JOptionPane.YES_OPTION) {
-                JgSystemUtil.restartJarApplication(SettingsDialog.class);
+                Util.restartJarApplication(SettingsDialog.class);
             } else {
                 dispose();
             }            

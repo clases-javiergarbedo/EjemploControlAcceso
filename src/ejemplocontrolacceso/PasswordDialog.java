@@ -5,8 +5,6 @@
  */
 package ejemplocontrolacceso;
 
-import es.javiergarbedo.aula.util.JgConversionUtil;
-
 /**
  *
  * @author Javier García Escobedo <javiergarbedo.es>
@@ -110,7 +108,7 @@ public class PasswordDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jButtonCancelActionPerformed
 
     private void jButtonOkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonOkActionPerformed
-        passwordMd5 = JgConversionUtil.toMd5(jPasswordField1.getPassword(), true);
+        passwordMd5 = Util.toMd5(jPasswordField1.getPassword(), true);
         OkButtonPressed = true;
         dispose();
     }//GEN-LAST:event_jButtonOkActionPerformed
