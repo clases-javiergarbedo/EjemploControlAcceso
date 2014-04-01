@@ -52,12 +52,20 @@ public class Main extends javax.swing.JFrame {
                             JOptionPane.ERROR_MESSAGE);
                     return false;
                 }
-            } else {
+            } else { //Se ha pulsado en botón Cancelar en la ventana de solicitud de contraseña
                 return false;
             }            
         } else { //No hay contraseña establecida aún
-            openSettingsDialog();
+            //Abrir la ventana de configuración para pedir nueva contraseña
+            SettingsDialog settingsDialog = new SettingsDialog(this, true);
+            settingsDialog.setProperties(properties);
+            settingsDialog.setVisible(true); 
+            //Si no se ha pulsado el botón OK, no se acepta la password introducida
+            if(!settingsDialog.isOkButtonPressed()) {
+                return false;
+            }
         }
+        //Todo ha ido bien. Se considera que la contraseña introducida es correcta 
         return true;
     }
 
@@ -71,13 +79,7 @@ public class Main extends javax.swing.JFrame {
         } catch (IOException ex) {
             Logger.getLogger(SettingsDialog.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }
-    
-    private void openSettingsDialog() {
-        SettingsDialog settingsDialog = new SettingsDialog(this, true);
-        settingsDialog.setProperties(properties);
-        settingsDialog.setVisible(true);        
-    }
+    }   
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -125,12 +127,14 @@ public class Main extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButtonSettingsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonSettingsActionPerformed
-        openSettingsDialog();
+        SettingsDialog settingsDialog = new SettingsDialog(this, true);
+        settingsDialog.setProperties(properties);
+        settingsDialog.setVisible(true); 
     }//GEN-LAST:event_jButtonSettingsActionPerformed
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
         try {
-            //Guardar las propiedades en el archuivo
+            //Guardar las propiedades en el archivo
             properties.store(new FileWriter(Globals.PROPERTIES_FILE_NAME), "");
         } catch (IOException ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);

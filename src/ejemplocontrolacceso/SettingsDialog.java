@@ -16,10 +16,14 @@
  */
 package ejemplocontrolacceso;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
 
@@ -30,6 +34,7 @@ import javax.swing.JOptionPane;
 public class SettingsDialog extends javax.swing.JDialog {
 
     private Properties properties;
+    private boolean okButtonPressed = false;
 
     /**
      * Creates new form JgChangePrivateKeyPropertyDialog
@@ -40,7 +45,7 @@ public class SettingsDialog extends javax.swing.JDialog {
         setResizable(false);
         setLocationRelativeTo(parent);
         getRootPane().setDefaultButton(jButtonOk);    
-    }
+    }    
     
     public void setProperties(Properties properties) {
         this.properties = properties;
@@ -57,6 +62,10 @@ public class SettingsDialog extends javax.swing.JDialog {
             jPasswordFieldConfirm.setEnabled(true);
         }
     }
+
+    public boolean isOkButtonPressed() {
+        return okButtonPressed;
+    }       
     
     public void fillComboBoxLanguages() {
         //Crear un array con los nombres completos de los idiomas
@@ -319,7 +328,7 @@ public class SettingsDialog extends javax.swing.JDialog {
                 JOptionPane.showMessageDialog(this, 
                         Globals.BUNDLE.getString("wrongPassword"), 
                         Globals.BUNDLE.getString("appTitle"), 
-                        JOptionPane.WARNING_MESSAGE);
+                        JOptionPane.ERROR_MESSAGE);
             }
         }
         
@@ -335,10 +344,17 @@ public class SettingsDialog extends javax.swing.JDialog {
                     Globals.BUNDLE.getString("appTitle"), 
                     JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
             if (response == JOptionPane.YES_OPTION) {
-                Util.restartJarApplication(SettingsDialog.class);
+                //Guardar las propiedades en el archivo y reiniciar
+                try {
+                    properties.store(new FileWriter(Globals.PROPERTIES_FILE_NAME), "");
+                    Util.restartJarApplication(SettingsDialog.class);
+                } catch (IOException ex) {
+                    Logger.getLogger(SettingsDialog.class.getName()).log(Level.SEVERE, null, ex);
+                }
             } else {
+                okButtonPressed = true;
                 dispose();
-            }            
+            }
         }
     }//GEN-LAST:event_jButtonOkActionPerformed
 
